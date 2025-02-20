@@ -12,6 +12,28 @@ class Interpreter:
     def generic_visit(self, node):
         raise Exception(f'No visit_{type(node).__name__} method')
 
+    def visit_BoolOp(self, node):
+        left = self.visit(node.left)
+        right = self.visit(node.right)
+        
+        if node.op.type == EQUAL:
+            return left == right
+        
+        elif node.op.type == NOTEQUAL:
+            return left != right
+        
+        elif node.op.type == GREATERTHAN:
+            return left > right
+        
+        elif node.op.type == LESSTHAN:
+            return left < right
+        
+        elif node.op.type == GREATERTHAN_EQUAL:
+            return left >= right
+        
+        elif node.op.type == LESSTHAN_EQUAL:
+            return left <= right
+    
     def visit_BinOp(self, node):
         left = self.visit(node.left)
         right = self.visit(node.right)

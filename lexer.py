@@ -7,8 +7,8 @@ class Lexer:
         self.pos = 0
         self.current_char = self.text[self.pos] if self.text else None
 
-    def advance(self):
-        self.pos += 1
+    def advance(self, offset=1):
+        self.pos += offset
         self.current_char = self.text[self.pos] if self.pos < len(self.text) else None
 
     def ignore_whitespace(self):
@@ -48,7 +48,32 @@ class Lexer:
 
                 return Token(STRING, result)
 
-
+            if self.current_char == '=' and self.text[self.pos + 1] == '=':
+                self.advance(offset=2)
+                return Token(EQUAL, '==')
+            
+            if self.current_char == '!' and self.text[self.pos + 1] == '=':
+                self.advance(offset=2)
+                return Token(NOTEQUAL, '!=')
+            
+            if self.current_char == '>' and self.text[self.pos + 1] == '=':
+                self.advance(offset=2)
+                return Token(GREATERTHAN_EQUAL, '>=')
+            
+            elif self.current_char == '<' and self.text[self.pos + 1] == '=':
+                self.advance(offset=2)
+                return Token(LESSTHAN_EQUAL, '<=')
+            
+            elif self.current_char == '>':
+                self.advance()
+                return Token(GREATERTHAN, '>')
+            
+            elif self.current_char == '<':
+                self.advance()
+                return Token(LESSTHAN, '<')
+            
+        
+            
             if self.current_char == '+':
                 self.advance()
                 return Token(PLUS, '+')

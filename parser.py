@@ -9,6 +9,12 @@ class BinOp(AST):
         self.token = self.op = op
         self.right = right
 
+class BoolOp(AST):
+    def __init__(self, left, op, right):
+        self.left = left
+        self.token = self.op = op
+        self.right = right
+
 class Num(AST):
     def __init__(self, token):
         self.token = token
@@ -47,6 +53,14 @@ class Parser:
         elif token.type == STRING:
             self.eat(STRING)
             return String(token)
+        
+        elif token.type == TRUE:
+            self.eat(TRUE)
+            return BoolOp(left=None, op=token, right=None)  # Represents `True`
+
+        elif token.type == FALSE:
+            self.eat(FALSE)
+            return BoolOp(left=None, op=token, right=None)  # Represents `False`
         
         elif token.type == LPAREN:
             self.eat(LPAREN)
@@ -87,5 +101,45 @@ class Parser:
             node = BinOp(left=node, op=token, right=self.term())
         return node
 
+    def comp_expr(self):
+        node = self.expr()
+        
+        while self.current_token.type in (EQUAL, NOTEQUAL, LESSTHAN, GREATERTHAN, LESSTHAN_EQUAL, GREATERTHAN_EQUAL): 
+            token = self.current_token
+
+            if token.type == EQUAL:
+                self.eat(EQUAL)
+
+            elif token.type == NOTEQUAL:
+                self.eat(NOTEQUAL)
+                
+            elif token.type == GREATERTHAN:
+                self.eat(GREATERTHAN)
+            
+            elif token.type == LESSTHAN:
+                self.eat(LESSTHAN)
+            
+            elif token.type == GREATERTHAN_EQUAL:
+                self.eat(GREATERTHAN_EQUAL)
+            
+            elif token.type == LESSTHAN_EQUAL:
+                self.eat(LESSTHAN_EQUAL)
+                
+            node = BoolOp(left=node, op=token, right=self.expr())
+        return node
+
+    def logical_and_expr(self):
+        node = self.comp_expr()
+
+    
+        return node
+    
+
+    def logical_or_expr(self):
+        node = self.logical_and_expr()
+
+    
+        return node
+    
     def parse(self):
-        return self.expr()
+        return self.logical_or_expr()
