@@ -14,6 +14,11 @@ class Num(AST):
         self.token = token
         self.value = token.value
 
+class String(AST):
+    def __init__(self, token):
+        self.token = token
+        self.value = token.value
+
 class UnaryOp(AST):
     def __init__(self, op, expr):
         self.token = self.op = op
@@ -39,6 +44,10 @@ class Parser:
             self.eat(INTEGER)
             return Num(token)
         
+        elif token.type == STRING:
+            self.eat(STRING)
+            return String(token)
+        
         elif token.type == LPAREN:
             self.eat(LPAREN)
             node = self.expr()
@@ -53,6 +62,7 @@ class Parser:
         node = self.factor()
         while self.current_token.type in (MULTIPLY, DIVIDE):
             token = self.current_token
+
             if token.type == MULTIPLY:
                 self.eat(MULTIPLY)
 
@@ -64,8 +74,10 @@ class Parser:
 
     def expr(self):
         node = self.term()
+        
         while self.current_token.type in (PLUS, MINUS):
             token = self.current_token
+
             if token.type == PLUS:
                 self.eat(PLUS)
 

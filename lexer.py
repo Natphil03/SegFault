@@ -1,4 +1,4 @@
-from datatypes import INTEGER, PLUS, MINUS, MULTIPLY, DIVIDE, LPAREN, RPAREN, EOF, NEGATE
+from datatypes import *
 from sfToken import Token
 
 class Lexer:
@@ -33,6 +33,22 @@ class Lexer:
             if self.current_char.isdigit():
                 return Token(INTEGER, self.integer())
             
+            if self.current_char == '"':
+                self.advance()  # Skip the opening quote
+                result = ''
+                
+                while self.current_char is not None and self.current_char != '"':
+                    result += self.current_char
+                    self.advance()
+                
+                if self.current_char == '"':
+                    self.advance()  # Consume the closing quote
+                else:
+                    raise Exception('Unterminated string literal')
+
+                return Token(STRING, result)
+
+
             if self.current_char == '+':
                 self.advance()
                 return Token(PLUS, '+')

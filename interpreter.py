@@ -13,19 +13,31 @@ class Interpreter:
         raise Exception(f'No visit_{type(node).__name__} method')
 
     def visit_BinOp(self, node):
+        left = self.visit(node.left)
+        right = self.visit(node.right)
+        
         if node.op.type == PLUS:
-            return self.visit(node.left) + self.visit(node.right)
-        
+
+            # If either operand is a string, perform string concatenation
+            if isinstance(left, str) or isinstance(right, str):
+                return str(left) + str(right)
+            
+            return left + right  # Normal addition for numbers
+
         elif node.op.type == MINUS:
-            return self.visit(node.left) - self.visit(node.right)
-        
+            return left - right
+
         elif node.op.type == MULTIPLY:
-            return self.visit(node.left) * self.visit(node.right)
-        
+            return left * right
+
         elif node.op.type == DIVIDE:
-            return self.visit(node.left) / self.visit(node.right)
+            return left / right
+
 
     def visit_Num(self, node):
+        return node.value
+
+    def visit_String(self, node):
         return node.value
 
     def visit_UnaryOp(self, node):
