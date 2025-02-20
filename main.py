@@ -14,18 +14,32 @@ class Token:
     def __repr__(self):
         return self.__str__()
 
-class Interpreter:
+class AST:
+    pass
+
+class BinOp(AST):
+    def __init__(self, left, op, right):
+        self.left = left
+        self.token = self.op = op
+        self.right = right
+
+class Num(AST):
+    def __init__(self, token):
+        self.token = token
+        self.value = token.value
+
+class UnaryOp(AST):
+    def __init__(self, op, expr):
+        self.token = self.op = op
+        self.expr = expr
+
+class Lexer:
     def __init__(self, text):
         self.text = text
         self.pos = 0
-        self.current_token = None
         self.current_char = self.text[self.pos] if self.text else None
 
-    def error(self):
-        raise Exception('Error parsing input')
-
     def advance(self):
-        """Move position forward and update current_char"""
         self.pos += 1
         self.current_char = self.text[self.pos] if self.pos < len(self.text) else None
 
@@ -33,147 +47,136 @@ class Interpreter:
         while self.current_char is not None and self.current_char.isspace():
             self.advance()
 
-    def find_full_integer(self):
-        """Extracts multi-digit integer from input"""
-        str_int = ""
-
+    def integer(self):
+        result = ''
         while self.current_char is not None and self.current_char.isdigit():
-            str_int += self.current_char
+            result += self.current_char
             self.advance()
-
-        return int(str_int)
+        return int(result)
 
     def get_next_token(self):
-        """Lexical analyzer that tokenizes the input"""
         while self.current_char is not None:
             self.ignore_whitespace()
-
+            
             if self.current_char is None:
                 return Token(EOF, None)
+
+            if self.current_char.isdigit():
+                return Token(INTEGER, self.integer())
+            
+            if self.current_char == '+':
+                self.advance()
+                return Token(PLUS, '+')
             
             if self.current_char == '-':
                 self.advance()
-                
-                if self.current_char is not None and self.current_char.isdigit():
-                    return Token(INTEGER, self.find_full_integer(), NEGATE)
-
-                elif self.current_char in {' ', '(', ')', '*', '/', '+', '-', EOF}:  # It's a subtraction operator
-                    return Token(MINUS, '-')
-
-                
-            if self.current_char.isdigit():
-                return Token(INTEGER, self.find_full_integer())
-
-            elif self.current_char == '+':
-                self.advance()
-                return Token(PLUS, '+')
-
-            elif self.current_char == '-':
-                self.advance()
                 return Token(MINUS, '-')
             
-            elif self.current_char == '*':
+            if self.current_char == '*':
                 self.advance()
                 return Token(MULTIPLY, '*')
-
-            elif self.current_char == '/':
+            
+            if self.current_char == '/':
                 self.advance()
                 return Token(DIVIDE, '/')
-
-            elif self.current_char == '(':
+            
+            if self.current_char == '(': 
                 self.advance()
                 return Token(LPAREN, '(')
-
-            elif self.current_char == ')':
+            
+            if self.current_char == ')':
                 self.advance()
                 return Token(RPAREN, ')')
-
-            self.error()
-
+            
+            raise Exception('Invalid character')
+        
         return Token(EOF, None)
 
-    def get_expression(self):
-        """Convert the input into Reverse Polish Notation (RPN) using the Shunting-Yard Algorithm"""
-        output_queue = []
-        operator_stack = []
+class Parser:
+    def __init__(self, lexer):
+        self.lexer = lexer
+        self.current_token = self.lexer.get_next_token()
 
-        self.current_token = self.get_next_token()
+    def error(self):
+        raise Exception('Invalid syntax')
 
-        while self.current_token.type != EOF:
-            
-            if self.current_token.type == INTEGER:
-                if self.current_token.subtype == NEGATE:
-                    output_queue.append(Token(INTEGER, -self.current_token.value))
-                else:
-                    output_queue.append(self.current_token)
+    def eat(self, token_type):
+        if self.current_token.type == token_type:
+            self.current_token = self.lexer.get_next_token()
+        else:
+            self.error()
 
-            elif self.current_token.type in OPERATORS:
-                # Handle operator precedence
-                while (operator_stack and 
-                    operator_stack[-1].type in OPERATORS and 
-                    OPERATORS[operator_stack[-1].type] >= OPERATORS[self.current_token.type]):
-                    output_queue.append(operator_stack.pop())
+    def factor(self):
+        token = self.current_token
+        if token.type == INTEGER:
+            self.eat(INTEGER)
+            return Num(token)
+        elif token.type == LPAREN:
+            self.eat(LPAREN)
+            node = self.expr()
+            self.eat(RPAREN)
+            return node
+        elif token.type == MINUS:
+            self.eat(MINUS)
+            return UnaryOp(token, self.factor())
 
-                operator_stack.append(self.current_token)
+    def term(self):
+        node = self.factor()
+        while self.current_token.type in (MULTIPLY, DIVIDE):
+            token = self.current_token
+            if token.type == MULTIPLY:
+                self.eat(MULTIPLY)
+            elif token.type == DIVIDE:
+                self.eat(DIVIDE)
+            node = BinOp(left=node, op=token, right=self.factor())
+        return node
 
-            elif self.current_token.type == LPAREN:
-                # Left parenthesis, just push to stack
-                operator_stack.append(self.current_token)
+    def expr(self):
+        node = self.term()
+        while self.current_token.type in (PLUS, MINUS):
+            token = self.current_token
+            if token.type == PLUS:
+                self.eat(PLUS)
+            elif token.type == MINUS:
+                self.eat(MINUS)
+            node = BinOp(left=node, op=token, right=self.term())
+        return node
 
-            elif self.current_token.type == RPAREN:
-                # Right parenthesis, pop from stack until left parenthesis is found
-                while operator_stack and operator_stack[-1].type != LPAREN:
-                    output_queue.append(operator_stack.pop())
-                    
-                if not operator_stack:
-                    self.error()  # Mismatched parentheses
+    def parse(self):
+        return self.expr()
 
-                operator_stack.pop()  # Pop the '(' from stack
+class Interpreter:
+    def __init__(self, parser):
+        self.parser = parser
 
-            self.current_token = self.get_next_token()
+    def visit(self, node):
+        method_name = f'visit_{type(node).__name__}'
+        method = getattr(self, method_name, self.generic_visit)
+        return method(node)
 
-        # After reading all tokens, pop remaining operators from the stack
-        while operator_stack:
-            if operator_stack[-1].type in {LPAREN, RPAREN}:
-                self.error()  # Mismatched parentheses
-            output_queue.append(operator_stack.pop())
+    def generic_visit(self, node):
+        raise Exception(f'No visit_{type(node).__name__} method')
 
-        return output_queue
+    def visit_BinOp(self, node):
+        if node.op.type == PLUS:
+            return self.visit(node.left) + self.visit(node.right)
+        elif node.op.type == MINUS:
+            return self.visit(node.left) - self.visit(node.right)
+        elif node.op.type == MULTIPLY:
+            return self.visit(node.left) * self.visit(node.right)
+        elif node.op.type == DIVIDE:
+            return self.visit(node.left) / self.visit(node.right)
 
+    def visit_Num(self, node):
+        return node.value
 
-    def compute(self):
-        """Evaluate the expression in RPN format using a stack"""
-        rpn_expression = self.get_expression()
-        operand_stack = []
+    def visit_UnaryOp(self, node):
+        if node.op.type == MINUS:
+            return -self.visit(node.expr)
 
-        for token in rpn_expression:
-
-            if token.type == INTEGER:
-                operand_stack.append(token.value)
-            
-            elif token.type in OPERATORS:
-                if len(operand_stack) < 2:
-                    self.error()  # Not enough operands 
-
-                right = operand_stack.pop()
-                left = operand_stack.pop()
-
-                if token.type == PLUS:
-                    operand_stack.append(left + right)
-
-                elif token.type == MINUS:
-                    operand_stack.append(left - right)
-                
-                elif token.type == MULTIPLY:
-                    operand_stack.append(left * right)
-                
-                elif token.type == DIVIDE:
-                    operand_stack.append(left / right)
-
-        if len(operand_stack) != 1:
-            self.error()  # Invalid expression
-
-        return operand_stack[0]
+    def interpret(self):
+        tree = self.parser.parse()
+        return self.visit(tree)
 
 def main():
     while True:
@@ -185,8 +188,10 @@ def main():
         if not text:
             continue
 
-        interpreter = Interpreter(text)
-        result = interpreter.compute()
+        lexer = Lexer(text)
+        parser = Parser(lexer)
+        interpreter = Interpreter(parser)
+        result = interpreter.interpret()
         print(result)
 
 if __name__ == '__main__':
