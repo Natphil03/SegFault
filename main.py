@@ -47,7 +47,7 @@ class Interpreter:
         """Lexical analyzer that tokenizes the input"""
         while self.current_char is not None:
             self.ignore_whitespace()
-            print(self.current_char)
+
             if self.current_char is None:
                 return Token(EOF, None)
             
@@ -144,7 +144,6 @@ class Interpreter:
     def compute(self):
         """Evaluate the expression in RPN format using a stack"""
         rpn_expression = self.get_expression()
-        print(rpn_expression)
         operand_stack = []
 
         for token in rpn_expression:
