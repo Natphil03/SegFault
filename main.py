@@ -52,6 +52,7 @@ class Lexer:
         while self.current_char is not None and self.current_char.isdigit():
             result += self.current_char
             self.advance()
+            
         return int(result)
 
     def get_next_token(self):
@@ -111,11 +112,13 @@ class Parser:
         if token.type == INTEGER:
             self.eat(INTEGER)
             return Num(token)
+        
         elif token.type == LPAREN:
             self.eat(LPAREN)
             node = self.expr()
             self.eat(RPAREN)
             return node
+        
         elif token.type == MINUS:
             self.eat(MINUS)
             return UnaryOp(token, self.factor())
@@ -126,8 +129,10 @@ class Parser:
             token = self.current_token
             if token.type == MULTIPLY:
                 self.eat(MULTIPLY)
+
             elif token.type == DIVIDE:
                 self.eat(DIVIDE)
+
             node = BinOp(left=node, op=token, right=self.factor())
         return node
 
@@ -137,8 +142,10 @@ class Parser:
             token = self.current_token
             if token.type == PLUS:
                 self.eat(PLUS)
+
             elif token.type == MINUS:
                 self.eat(MINUS)
+
             node = BinOp(left=node, op=token, right=self.term())
         return node
 
@@ -160,10 +167,13 @@ class Interpreter:
     def visit_BinOp(self, node):
         if node.op.type == PLUS:
             return self.visit(node.left) + self.visit(node.right)
+        
         elif node.op.type == MINUS:
             return self.visit(node.left) - self.visit(node.right)
+        
         elif node.op.type == MULTIPLY:
             return self.visit(node.left) * self.visit(node.right)
+        
         elif node.op.type == DIVIDE:
             return self.visit(node.left) / self.visit(node.right)
 
