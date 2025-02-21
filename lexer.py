@@ -1,4 +1,4 @@
-from datatypes import *
+from type import *
 from sfToken import Token
 
 class Lexer:
@@ -23,15 +23,24 @@ class Lexer:
             
         return int(result)
 
+    def check_x_chars(self, num_char_to_check):
+        result = ''
+        
+        for i in range(0, num_char_to_check):
+            result += self.text[self.pos + i]
+            
+        return result
+        
+
     def get_next_token(self):
         while self.current_char is not None:
             self.ignore_whitespace()
             
             if self.current_char is None:
-                return Token(EOF, None)
+                return Token(types.EOF, None)
 
             if self.current_char.isdigit():
-                return Token(INTEGER, self.integer())
+                return Token(types.INTEGER, self.integer())
             
             if self.current_char == '"':
                 self.advance()  # Skip the opening quote
@@ -42,62 +51,81 @@ class Lexer:
                     self.advance()
                 
                 if self.current_char == '"':
-                    self.advance()  # Consume the closing quote
+                    self.advance()  # Skip the closing quote
                 else:
                     raise Exception('Unterminated string literal')
 
-                return Token(STRING, result)
+                return Token(types.STRING, result)
 
             if self.current_char == '=' and self.text[self.pos + 1] == '=':
                 self.advance(offset=2)
-                return Token(EQUAL, '==')
+                return Token(types.EQUAL, '==')
             
             if self.current_char == '!' and self.text[self.pos + 1] == '=':
                 self.advance(offset=2)
-                return Token(NOTEQUAL, '!=')
+                return Token(types.NOTEQUAL, '!=')
+            
+            if self.current_char == '!' :
+                self.advance()
+                return Token(types.NOT, '!')
             
             if self.current_char == '>' and self.text[self.pos + 1] == '=':
                 self.advance(offset=2)
-                return Token(GREATERTHAN_EQUAL, '>=')
+                return Token(types.GREATERTHAN_EQUAL, '>=')
             
-            elif self.current_char == '<' and self.text[self.pos + 1] == '=':
+            if self.current_char == '<' and self.text[self.pos + 1] == '=':
                 self.advance(offset=2)
-                return Token(LESSTHAN_EQUAL, '<=')
+                return Token(types.LESSTHAN_EQUAL, '<=')
             
-            elif self.current_char == '>':
+            if self.current_char == '>':
                 self.advance()
-                return Token(GREATERTHAN, '>')
+                return Token(types.GREATERTHAN, '>')
             
-            elif self.current_char == '<':
+            if self.current_char == '<':
                 self.advance()
-                return Token(LESSTHAN, '<')
-            
-        
+                return Token(types.LESSTHAN, '<')
             
             if self.current_char == '+':
                 self.advance()
-                return Token(PLUS, '+')
+                return Token(types.PLUS, '+')
             
             if self.current_char == '-':
                 self.advance()
-                return Token(MINUS, '-')
+                return Token(types.MINUS, '-')
             
             if self.current_char == '*':
                 self.advance()
-                return Token(MULTIPLY, '*')
+                return Token(types.MULTIPLY, '*')
             
             if self.current_char == '/':
                 self.advance()
-                return Token(DIVIDE, '/')
+                return Token(types.DIVIDE, '/')
             
             if self.current_char == '(': 
                 self.advance()
-                return Token(LPAREN, '(')
+                return Token(types.LPAREN, '(')
             
             if self.current_char == ')':
                 self.advance()
-                return Token(RPAREN, ')')
+                return Token(types.RPAREN, ')')
             
+            if self.check_x_chars(4) == 'True' :
+                self.advance(offset=4)
+                return Token(types.TRUE, 'True')
+            
+            if self.check_x_chars(5) == 'False' :
+                self.advance(offset=5)
+                return Token(types.FALSE, 'False')
+            
+            if self.check_x_chars(3) == 'and' :
+                self.advance(offset=3)
+                return Token(types.AND, 'and')
+            
+            if self.check_x_chars(2) == 'or' :
+                self.advance(offset=2)
+                return Token(types.OR, 'or')
+            
+            print(self.current_char)
             raise Exception('Invalid character')
         
-        return Token(EOF, None)
+        return Token(types.EOF, None)
