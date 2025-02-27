@@ -1,0 +1,7 @@
+int xxx = 5 + 5;
+print(xxx);
+
+del xxx;
+
+int xxx = 12;
+print(xxx);
