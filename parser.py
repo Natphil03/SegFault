@@ -1,20 +1,63 @@
 from type import *
 from AST import *
-        
-class Parser:
-    def __init__(self, lexer):
-        self.lexer = lexer
-        self.current_token = self.lexer.get_next_token()
+import time
 
+class Parser:
+    def __init__(self, tokens):
+        self.tokens = tokens
+        self.pos = 0
+        self.current_token = self.tokens[self.pos]
+        self.AST_root = AST()
+
+    def advance_token(self):
+        self.pos += 1
+        
+        if self.pos < len(self.tokens):
+            self.current_token = self.tokens[self.pos] 
+ 
     def error(self):
         raise Exception('Invalid syntax')
 
     def eat(self, token_type):
         if self.current_token.type == token_type:
-            self.current_token = self.lexer.get_next_token()
+            self.advance_token()
         else:
             raise Exception(f"Syntax error: Expected {token_type}, got {self.current_token.type}")
 
+    def value(self):
+        token = self.current_token
+
+        if token.type == types.IDENTIFIER:
+            self.eat(types.IDENTIFIER)
+            return Identifier(token)  
+        
+    def assignment(self):
+        type_var = self.current_token
+        self.eat(types.INTEGER_TYPE)
+
+        iden = self.current_token
+        self.eat(types.IDENTIFIER)
+
+        assign_token = self.current_token
+        self.eat(types.ASSIGN)
+
+        val = self.logical_or_expr()
+
+        self.eat(types.SEMI_COLON)
+
+        return AssignOp(type=type_var, left=iden, op=assign_token, right=val)  # Create an AST node for assignment
+
+    def print_STMT(self):
+        statement = self.current_token
+        self.eat(types.PRINT_STMT)
+        self.eat(types.LPAREN)
+        
+        val = self.logical_or_expr()
+
+        self.eat(types.RPAREN)
+        self.eat(types.SEMI_COLON)
+
+        return Print(statement, val)  # Create an AST node for assignment
 
     def factor(self):
         token = self.current_token
@@ -49,12 +92,15 @@ class Parser:
             self.eat(types.NOT)
             return UnaryOp(token, self.factor())
         
-        else:
+        elif token.type == types.IDENTIFIER:
             return self.value()
+        
+        elif token.type == types.SEMI_COLON:
+            self.eat(types.SEMI_COLON)
         
     def term(self):
         node = self.factor()
-        
+
         while self.current_token.type in (types.MULTIPLY, types.DIVIDE):
             token = self.current_token
 
@@ -80,6 +126,7 @@ class Parser:
                 self.eat(types.MINUS)
 
             node = BinOp(left=node, op=token, right=self.term())
+
         return node
 
     def comp_expr(self):
@@ -118,7 +165,6 @@ class Parser:
             node = UnaryOp(token, node)  # Apply NOT before moving forward
 
         return node
-    
 
     def logical_or_expr(self):
         node = self.logical_and_expr()
@@ -131,4 +177,27 @@ class Parser:
         return node
     
     def parse(self):
-        return self.logical_or_expr()
+        
+        while self.pos < len(self.tokens):
+
+            if self.current_token.type == types.SEMI_COLON:
+                self.eat(types.SEMI_COLON)
+                continue
+
+            if self.current_token.type == types.EOF:
+                break
+
+            if self.current_token.type == types.INTEGER_TYPE:
+                assign = self.assignment()
+                self.AST_root.children.append(assign)
+
+            elif self.current_token.type == types.PRINT_STMT:
+                stmt = self.print_STMT()
+                self.AST_root.children.append(stmt)
+                
+            node = self.logical_or_expr()
+            self.AST_root.children.append(node)
+        
+        ast = [i for i in self.AST_root.children if i is not None]
+
+        return ast

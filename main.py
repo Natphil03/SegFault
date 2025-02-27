@@ -3,20 +3,22 @@ from lexer import Lexer
 from parser import Parser
 
 def main():
-    while True:
-        try:
-            text = input('calc> ')
-        except EOFError:
-            break
+    
+    src = open("test.sf", "r")
+    content = src.read()
+    # print(content)
+    
+    lexer = Lexer(content)
+    tokens = lexer.lex()
+    # print(tokens)
+    
+    parser = Parser(tokens)
+    AST = parser.parse()
+    # print(AST)
 
-        if not text:
-            continue
-
-        lexer = Lexer(text)
-        parser = Parser(lexer)
-        interpreter = Interpreter(parser)
-        result = interpreter.interpret()
-        print(result)
-
+    interpreter = Interpreter(AST)
+    interpreter.interpret()
+    
+    
 if __name__ == '__main__':
     main()

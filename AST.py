@@ -1,5 +1,6 @@
 class AST:
-    pass
+    def __init__(self):
+        self.children = []
 
 class BinOp(AST):
     def __init__(self, left, op, right):
@@ -27,3 +28,20 @@ class UnaryOp(AST):
     def __init__(self, op, expr):
         self.token = self.op = op
         self.expr = expr
+        
+class Identifier(AST):
+    def __init__(self, token):
+        self.token = token
+        self.name = token.value  
+
+class AssignOp(AST):
+    def __init__(self, type, left, op, right):
+        self.type = type
+        self.left = left  # Identifier node (variable name)
+        self.token = self.op = op  # Assignment token '='
+        self.right = right  # Expression on the right-hand side
+
+class Print(AST):
+    def __init__(self, token, value):
+        self.token = token
+        self.value = value

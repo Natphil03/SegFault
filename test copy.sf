@@ -1,0 +1,10 @@
+"hello";
+2 + 2;
+True == False;
+False == False;
+True == True;
+!(5 < 4);
+"10 corgis" != "10" + "corgis";
+"foo" + "bar" == "foobar";
+"hello" + " " + "world";
+(12 + 5) - -3 * (12 / 4);

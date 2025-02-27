@@ -23,5 +23,11 @@ class types(Enum):
     NOT = 20,
     AND = 21,
     OR = 22,
-    
-    
+    ASSIGN = 23,
+    IDENTIFIER = 24,
+    INTEGER_TYPE = 25,
+    SEMI_COLON = 26,
+    DECLARATION = 27,
+    FLOAT = 28,
+    STRING_TYPE = 29,
+    PRINT_STMT = 30
