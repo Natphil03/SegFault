@@ -40,7 +40,12 @@ class AssignOp(AST):
         self.left = left  # Identifier node (variable name)
         self.token = self.op = op  # Assignment token '='
         self.right = right  # Expression on the right-hand side
-
+        
+class DeAssignOp(AST):
+    def __init__(self, token, iden):
+        self.token = token
+        self.iden = iden
+      
 class Print(AST):
     def __init__(self, token, value):
         self.token = token

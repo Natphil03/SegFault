@@ -94,6 +94,8 @@ class Lexer:
                     return Token(types.STRING_TYPE, 'string')
                 elif identifier == 'print':
                     return Token(types.PRINT_STMT, 'print')
+                elif identifier == 'del':
+                    return Token(types.DELETE_VAR, 'del')
                 else:
                     return Token(types.IDENTIFIER, identifier)  # Variable name or function name
             

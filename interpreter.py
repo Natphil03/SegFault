@@ -52,7 +52,11 @@ class Interpreter:
             return left or right
     
     def visit_Identifier(self, node):
-        return self.symbol_tree[node.name]
+        if node.name in self.symbol_tree:
+            return self.symbol_tree[node.name]
+        else:
+            return Exception("Variable does not exist")
+
 
     def visit_BinOp(self, node):
 
@@ -99,9 +103,15 @@ class Interpreter:
     def visit_AssignOp(self, node):
         self.symbol_tree[node.left.value] = self.visit(node.right)
 
+    def visit_DeAssignOp(self, node):
+        if node.iden.value in self.symbol_tree:
+            self.symbol_tree.pop(node.iden.value)
+        else:
+            return Exception("Variable does not exist")
+
     def interpret(self):
         for node in self.tree:
             result = self.visit(node)
 
-            if(result is not None):
-               print(result) 
+            # if(result is not None):
+            #    print(result) 

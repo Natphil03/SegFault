@@ -1,5 +1,8 @@
 int xxx = 5 + 5;
 int yyy = 10;
 int eee = xxx + yyy + (10 * 2) / 9 + 2;
-eee;
+print(xxx);
+print(yyy);
+print((10 * 2) / 9 + 2);
+print(eee);
 

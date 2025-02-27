@@ -47,6 +47,15 @@ class Parser:
 
         return AssignOp(type=type_var, left=iden, op=assign_token, right=val)  # Create an AST node for assignment
 
+    def de_assignment(self):
+        token = self.current_token
+        self.eat(types.DELETE_VAR)
+
+        iden = self.current_token
+        self.eat(types.IDENTIFIER)
+        self.eat(types.SEMI_COLON)
+        return DeAssignOp(token=token, iden=iden)  # Create an AST node for assignment
+
     def print_STMT(self):
         statement = self.current_token
         self.eat(types.PRINT_STMT)
@@ -190,6 +199,10 @@ class Parser:
             if self.current_token.type == types.INTEGER_TYPE:
                 assign = self.assignment()
                 self.AST_root.children.append(assign)
+
+            elif self.current_token.type == types.DELETE_VAR:
+                de_assign = self.de_assignment()
+                self.AST_root.children.append(de_assign)
 
             elif self.current_token.type == types.PRINT_STMT:
                 stmt = self.print_STMT()
