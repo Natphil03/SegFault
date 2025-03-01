@@ -15,5 +15,5 @@ print(test);
 string string_test = "hello world";
 print(string_test);
 
-float float_test = 3.532 + 2.44325252525;
+float float_test = (3.532 + 2.44325252525 * 2) / 5;
 print(float_test);
