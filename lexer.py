@@ -22,12 +22,13 @@ class Lexer:
         while self.current_char is not None and self.current_char.isspace():
             self.advance()
 
-    def integer(self):
+    def find_integer(self):
         result = ''
+        
         while self.current_char is not None and self.current_char.isdigit():
             result += self.current_char
             self.advance()
-            
+        
         return int(result)
 
     def check_x_chars(self, num_char_to_check):
@@ -35,7 +36,6 @@ class Lexer:
         
         for i in range(0, num_char_to_check):
             result += self.text[self.pos + i]
-            
         return result
     
     def identifier(self):
@@ -45,6 +45,26 @@ class Lexer:
             result += self.current_char
             self.advance()
         return result
+    
+    def is_float(self):
+        temp_text = self.text
+        temp_current_pos = self.pos
+        
+        while temp_text[temp_current_pos] != ';' and temp_text[temp_current_pos] not in operators:
+            if temp_text[temp_current_pos] == '.':
+                return True
+
+            temp_current_pos +=1    
+        return False
+    
+    def find_float(self):
+        result = ''
+        
+        while self.current_char != ';' and self.current_char not in operators:
+            result += self.current_char
+            self.advance()
+            
+        return float(result)
     
     def get_next_token(self):
         
@@ -60,7 +80,10 @@ class Lexer:
                 return Token(types.SEMI_COLON, ';')
 
             if self.current_char.isdigit():
-                return Token(types.INTEGER, self.integer())
+                if self.is_float():
+                    return Token(types.FLOAT, self.find_float())
+                else:
+                    return Token(types.INTEGER, self.find_integer())
             
             if self.current_char == '"':
                 self.advance()  # Skip the opening quote
@@ -92,6 +115,10 @@ class Lexer:
                     return Token(types.INTEGER_TYPE, 'int')
                 elif identifier == 'string':
                     return Token(types.STRING_TYPE, 'string')
+                elif identifier == 'bool':
+                    return Token(types.BOOL_TYPE, 'bool')
+                elif identifier == 'float':
+                    return Token(types.FLOAT_TYPE, 'float')
                 elif identifier == 'print':
                     return Token(types.PRINT_STMT, 'print')
                 elif identifier == 'del':
@@ -103,55 +130,55 @@ class Lexer:
                 self.advance(offset=2)
                 return Token(types.EQUAL, '==')
             
-            if self.current_char == '=':
+            elif self.current_char == '=':
                 self.advance()
                 return Token(types.ASSIGN, '=')
             
-            if self.check_x_chars(2) == '!=':
+            elif self.check_x_chars(2) == '!=':
                 self.advance(offset=2)
                 return Token(types.NOTEQUAL, '!=')
             
-            if self.current_char == '!':
+            elif self.current_char == '!':
                 self.advance()
                 return Token(types.NOT, '!')
             
-            if self.check_x_chars(2) == '>=':
+            elif self.check_x_chars(2) == '>=':
                 self.advance(offset=2)
                 return Token(types.GREATERTHAN_EQUAL, '>=')
             
-            if self.check_x_chars(2) == '<=':
+            elif self.check_x_chars(2) == '<=':
                 self.advance(offset=2)
                 return Token(types.LESSTHAN_EQUAL, '<=')
             
-            if self.current_char == '>':
+            elif self.current_char == '>':
                 self.advance()
                 return Token(types.GREATERTHAN, '>')
             
-            if self.current_char == '<':
+            elif self.current_char == '<':
                 self.advance()
                 return Token(types.LESSTHAN, '<')
             
-            if self.current_char == '+':
+            elif self.current_char == '+':
                 self.advance()
                 return Token(types.PLUS, '+')
             
-            if self.current_char == '-':
+            elif self.current_char == '-':
                 self.advance()
                 return Token(types.MINUS, '-')
             
-            if self.current_char == '*':
+            elif self.current_char == '*':
                 self.advance()
                 return Token(types.MULTIPLY, '*')
             
-            if self.current_char == '/':
+            elif self.current_char == '/':
                 self.advance()
                 return Token(types.DIVIDE, '/')
             
-            if self.current_char == '(': 
+            elif self.current_char == '(': 
                 self.advance()
                 return Token(types.LPAREN, '(')
             
-            if self.current_char == ')':
+            elif self.current_char == ')':
                 self.advance()
                 return Token(types.RPAREN, ')')
             

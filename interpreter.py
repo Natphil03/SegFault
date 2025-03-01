@@ -53,7 +53,7 @@ class Interpreter:
     
     def visit_Identifier(self, node):
         if node.name in self.symbol_tree:
-            return self.symbol_tree[node.name]
+            return self.symbol_tree[node.name]["value"]
         else:
             return Exception("Variable does not exist")
 
@@ -101,17 +101,20 @@ class Interpreter:
             return not self.visit(node.expr)
 
     def visit_AssignOp(self, node):
-        self.symbol_tree[node.left.value] = self.visit(node.right)
+        if node.left.value not in self.symbol_tree:
+            visited_node = self.visit(node.right)
+            self.symbol_tree[node.left.value] = {}
+            self.symbol_tree[node.left.value]["type"] = type(visited_node)
+            self.symbol_tree[node.left.value]["value"] = visited_node 
+        else:
+            raise Exception("A Variable is already declared with the same name")
 
     def visit_DeAssignOp(self, node):
         if node.iden.value in self.symbol_tree:
             self.symbol_tree.pop(node.iden.value)
         else:
-            return Exception("Variable does not exist")
+            raise Exception("Variable does not exist, cannot delete")
 
     def interpret(self):
         for node in self.tree:
-            result = self.visit(node)
-
-            # if(result is not None):
-            #    print(result) 
+            self.visit(node)

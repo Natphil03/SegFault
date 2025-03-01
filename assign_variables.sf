@@ -1,8 +1,19 @@
+
 int xxx = 5 + 5;
-int yyy = 10;
-int eee = xxx + yyy + (10 * 2) / 9 + 2;
 print(xxx);
+
+int yyy = 10;
 print(yyy);
+
+int eee = xxx + yyy + (10 * 2) / 9 + 2;
 print((10 * 2) / 9 + 2);
 print(eee);
 
+bool test = True;
+print(test);
+
+string string_test = "hello world";
+print(string_test);
+
+float float_test = 3.532 + 2.44325252525;
+print(float_test);

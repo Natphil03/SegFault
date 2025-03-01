@@ -51,3 +51,4 @@ class types(Enum):
     IDENTIFIER = 24,
     EOF = 10,
     
+operators = ("+", "-", "/", "*")

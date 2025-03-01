@@ -4,7 +4,7 @@ from parser import Parser
 
 def main():
     
-    src = open("variable2.sf", "r")
+    src = open("assign_variables.sf", "r")
     content = src.read()
     # print(content)
     

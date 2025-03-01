@@ -33,7 +33,7 @@ class Parser:
         
     def assignment(self):
         type_var = self.current_token
-        self.eat(types.INTEGER_TYPE)
+        self.eat(type_var.type) # this is kinda wrong
 
         iden = self.current_token
         self.eat(types.IDENTIFIER)
@@ -78,6 +78,10 @@ class Parser:
         elif token.type == types.STRING:
             self.eat(types.STRING)
             return String(token)
+        
+        elif token.type == types.FLOAT:
+            self.eat(types.FLOAT)
+            return Num(token)
         
         elif token.type == types.TRUE:
             self.eat(types.TRUE)
@@ -196,11 +200,11 @@ class Parser:
             if self.current_token.type == types.EOF:
                 break
 
-            if self.current_token.type == types.INTEGER_TYPE:
+            while self.current_token.type in (types.INTEGER_TYPE, types.BOOL_TYPE, types.FLOAT_TYPE, types.STRING_TYPE):
                 assign = self.assignment()
                 self.AST_root.children.append(assign)
 
-            elif self.current_token.type == types.DELETE_VAR:
+            if self.current_token.type == types.DELETE_VAR:
                 de_assign = self.de_assignment()
                 self.AST_root.children.append(de_assign)
 
