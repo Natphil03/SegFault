@@ -100,7 +100,7 @@ class Interpreter:
         if node.op.type == types.NOT:
             return not self.visit(node.expr)
 
-    def visit_AssignOp(self, node):
+    def visit_DeclarationOp(self, node):
         if node.left.value not in self.symbol_tree:
             visited_node = self.visit(node.right)
             self.symbol_tree[node.left.value] = {}
@@ -108,7 +108,18 @@ class Interpreter:
             self.symbol_tree[node.left.value]["value"] = visited_node 
         else:
             raise Exception("A Variable is already declared with the same name")
+    
+    def visit_AssignOp(self, node):
+        if node.left.value in self.symbol_tree:
+            visited_node = self.visit(node.right)
+            
+            if type(visited_node) != self.symbol_tree[node.left.value]["type"]:
+                raise Exception("Variable Types does not match, cannot assign new value")
 
+            self.symbol_tree[node.left.value]["value"] = visited_node
+        else:
+            raise Exception("Variable does not exist, cannot assign new value")
+           
     def visit_DeAssignOp(self, node):
         if node.iden.value in self.symbol_tree:
             self.symbol_tree.pop(node.iden.value)

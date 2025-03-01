@@ -31,7 +31,7 @@ class Parser:
             self.eat(types.IDENTIFIER)
             return Identifier(token)  
         
-    def assignment(self):
+    def declaration(self):
         type_var = self.current_token
         self.eat(type_var.type) # this is kinda wrong
 
@@ -44,8 +44,19 @@ class Parser:
         val = self.logical_or_expr()
 
         self.eat(types.SEMI_COLON)
+        return DeclarationOp(type=type_var, left=iden, op=assign_token, right=val)  # Create an AST node for assignment
 
-        return AssignOp(type=type_var, left=iden, op=assign_token, right=val)  # Create an AST node for assignment
+    def assignment(self):
+        iden = self.current_token
+        self.eat(types.IDENTIFIER)
+
+        assign_token = self.current_token
+        self.eat(types.ASSIGN)
+
+        val = self.logical_or_expr()
+
+        self.eat(types.SEMI_COLON)
+        return AssignOp(left=iden, op=assign_token, right=val)  # Create an AST node for assignment
 
     def de_assignment(self):
         token = self.current_token
@@ -192,7 +203,7 @@ class Parser:
     def parse(self):
         
         while self.pos < len(self.tokens):
-
+            
             if self.current_token.type == types.SEMI_COLON:
                 self.eat(types.SEMI_COLON)
                 continue
@@ -201,17 +212,25 @@ class Parser:
                 break
 
             while self.current_token.type in (types.INTEGER_TYPE, types.BOOL_TYPE, types.FLOAT_TYPE, types.STRING_TYPE):
-                assign = self.assignment()
+                assign = self.declaration()
                 self.AST_root.children.append(assign)
+                continue
 
             if self.current_token.type == types.DELETE_VAR:
                 de_assign = self.de_assignment()
                 self.AST_root.children.append(de_assign)
+                continue
 
             elif self.current_token.type == types.PRINT_STMT:
                 stmt = self.print_STMT()
                 self.AST_root.children.append(stmt)
-                
+                continue
+
+            elif self.current_token.type == types.IDENTIFIER and self.tokens[self.pos + 1].type == types.ASSIGN:
+                assign = self.assignment()
+                self.AST_root.children.append(assign)
+                continue
+
             node = self.logical_or_expr()
             self.AST_root.children.append(node)
         

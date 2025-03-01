@@ -34,9 +34,15 @@ class Identifier(AST):
         self.token = token
         self.name = token.value  
 
-class AssignOp(AST):
+class DeclarationOp(AST):
     def __init__(self, type, left, op, right):
         self.type = type
+        self.left = left  # Identifier node (variable name)
+        self.token = self.op = op  # Assignment token '='
+        self.right = right  # Expression on the right-hand side
+    
+class AssignOp(AST):
+    def __init__(self, left, op, right):
         self.left = left  # Identifier node (variable name)
         self.token = self.op = op  # Assignment token '='
         self.right = right  # Expression on the right-hand side

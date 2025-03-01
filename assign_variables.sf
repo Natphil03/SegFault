@@ -1,5 +1,6 @@
 
 int xxx = 5 + 5;
+xxx = xxx + 23;
 print(xxx);
 
 int yyy = 10;
