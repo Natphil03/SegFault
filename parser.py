@@ -79,6 +79,57 @@ class Parser:
 
         return Print(statement, val)  # Create an AST node for assignment
 
+    def handle_token(self):
+        if self.current_token.type == types.SEMI_COLON:
+            self.eat(types.SEMI_COLON)
+            return None
+
+        elif self.current_token.type in (types.INTEGER_TYPE, types.BOOL_TYPE, types.FLOAT_TYPE, types.STRING_TYPE):
+            return self.declaration()
+
+        elif self.current_token.type == types.DELETE_VAR:
+            return self.de_assignment()
+
+        elif self.current_token.type == types.PRINT_STMT:
+            return self.print_STMT()
+
+        elif self.current_token.type == types.IDENTIFIER and self.tokens[self.pos + 1].type == types.ASSIGN:
+            return self.assignment()
+
+        elif self.current_token.type == types.IF:
+            return self.if_STMT()
+        
+        else:
+            return self.logical_or_expr()  # Handle expressions
+
+    def block(self):
+        statements = []
+        self.eat(types.CB_OPEN)  # Consume '{'
+
+        while self.current_token.type != types.CB_CLOSE and self.current_token.type != types.EOF:
+            stmt = self.handle_token()
+            
+            if stmt:
+                statements.append(stmt)
+        
+        self.eat(types.CB_CLOSE)  # Consume '}'
+        return statements
+        
+    def if_STMT(self):
+        self.eat(types.IF)
+        self.eat(types.LPAREN)
+
+        node_val = self.logical_or_expr()
+        
+        self.eat(types.RPAREN)
+
+        if self.current_token.type == types.CB_OPEN:
+            body = self.block()  # Parse the block if { is found
+        else:
+            body = [self.handle_token()]  # Handle single statement
+
+        return IfOp(expr=node_val, body=body)
+
     def factor(self):
         token = self.current_token
 
@@ -201,39 +252,15 @@ class Parser:
         return node
     
     def parse(self):
-        
         while self.pos < len(self.tokens):
-            
-            if self.current_token.type == types.SEMI_COLON:
-                self.eat(types.SEMI_COLON)
-                continue
-
             if self.current_token.type == types.EOF:
                 break
 
-            while self.current_token.type in (types.INTEGER_TYPE, types.BOOL_TYPE, types.FLOAT_TYPE, types.STRING_TYPE):
-                assign = self.declaration()
-                self.AST_root.children.append(assign)
-                continue
-
-            if self.current_token.type == types.DELETE_VAR:
-                de_assign = self.de_assignment()
-                self.AST_root.children.append(de_assign)
-                continue
-
-            elif self.current_token.type == types.PRINT_STMT:
-                stmt = self.print_STMT()
+            stmt = self.handle_token()
+            
+            if stmt:
                 self.AST_root.children.append(stmt)
-                continue
-
-            elif self.current_token.type == types.IDENTIFIER and self.tokens[self.pos + 1].type == types.ASSIGN:
-                assign = self.assignment()
-                self.AST_root.children.append(assign)
-                continue
-
-            node = self.logical_or_expr()
-            self.AST_root.children.append(node)
-        
+            
         ast = [i for i in self.AST_root.children if i is not None]
 
         return ast

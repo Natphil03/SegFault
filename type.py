@@ -44,10 +44,17 @@ class types(Enum):
     PRINT_STMT = 30,
     DELETE_VAR = 33,
     
+    # Control Flow
+    IF = 40,
+    WHILE = 41,
+    FOR = 42,
     
+        
     LPAREN = 8,
     RPAREN = 9,
     SEMI_COLON = 26,
+    CB_OPEN = 43,
+    CB_CLOSE = 44,
     IDENTIFIER = 24,
     EOF = 10,
     

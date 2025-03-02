@@ -29,6 +29,11 @@ class UnaryOp(AST):
         self.token = self.op = op
         self.expr = expr
         
+class IfOp(AST):
+    def __init__(self, expr, body):
+        self.expr = expr
+        self.body = body
+        
 class Identifier(AST):
     def __init__(self, token):
         self.token = token

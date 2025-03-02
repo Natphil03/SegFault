@@ -35,7 +35,7 @@ class Lexer:
         result = ''
         
         for i in range(0, num_char_to_check):
-            result += self.text[self.pos + i]
+            result += self.text[self.pos + i]                
         return result
     
     def identifier(self):
@@ -78,6 +78,8 @@ class Lexer:
             if self.current_char == ';':
                 self.advance()
                 return Token(types.SEMI_COLON, ';')
+            
+
 
             if self.current_char.isdigit():
                 if self.is_float():
@@ -123,6 +125,10 @@ class Lexer:
                     return Token(types.PRINT_STMT, 'print')
                 elif identifier == 'del':
                     return Token(types.DELETE_VAR, 'del')
+                elif identifier == 'if':
+                    return Token(types.IF, 'if')
+                elif identifier == 'while':
+                    return Token(types.WHILE, 'while')
                 else:
                     return Token(types.IDENTIFIER, identifier)  # Variable name or function name
             
@@ -182,6 +188,15 @@ class Lexer:
                 self.advance()
                 return Token(types.RPAREN, ')')
             
+            elif self.current_char == '{':
+                self.advance()
+                return Token(types.CB_OPEN, '{')
+                        
+            elif self.current_char == '}':
+                self.advance()
+                return Token(types.CB_CLOSE, '}')
+            
+            print(self.current_char)
             raise Exception('Invalid character')
         
         return Token(types.EOF, None)

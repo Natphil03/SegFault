@@ -1,0 +1,7 @@
+bool is_running = True;
+
+if (is_running) {
+    print(is_running);
+};
+
+print("hello");
