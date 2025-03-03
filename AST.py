@@ -33,7 +33,12 @@ class IfOp(AST):
     def __init__(self, expr, body):
         self.expr = expr
         self.body = body
-        
+
+class WhileOp(AST):
+    def __init__(self, expr, body):
+        self.expr = expr
+        self.body = body
+    
 class Identifier(AST):
     def __init__(self, token):
         self.token = token

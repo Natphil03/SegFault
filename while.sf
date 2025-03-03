@@ -1,0 +1,18 @@
+bool is_running = True;
+bool check_true = True;
+
+int i = 0;
+
+while (is_running) {
+    i = i + 1;
+    
+    print(i);
+
+    if (i > 5){
+        print("hello");
+        is_running = False;
+    };
+    
+};
+
+print("HELLO END");

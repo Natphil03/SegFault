@@ -4,7 +4,7 @@ from parser import Parser
 
 def main():
     
-    src = open("if.sf", "r")
+    src = open("while.sf", "r")
     content = src.read()
     # print(content)
     

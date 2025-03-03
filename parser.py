@@ -99,6 +99,9 @@ class Parser:
         elif self.current_token.type == types.IF:
             return self.if_STMT()
         
+        elif self.current_token.type == types.WHILE:
+            return self.while_STMT()
+        
         else:
             return self.logical_or_expr()  # Handle expressions
 
@@ -130,6 +133,21 @@ class Parser:
 
         return IfOp(expr=node_val, body=body)
 
+    def while_STMT(self):
+        self.eat(types.WHILE)
+        self.eat(types.LPAREN)
+
+        node_val = self.logical_or_expr()
+        
+        self.eat(types.RPAREN)
+
+        if self.current_token.type == types.CB_OPEN:
+            body = self.block()  # Parse the block if { is found
+        else:
+            body = [self.handle_token()]  # Handle single statement
+
+        return WhileOp(expr=node_val, body=body)
+    
     def factor(self):
         token = self.current_token
 

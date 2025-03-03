@@ -133,6 +133,16 @@ class Interpreter:
             for stmt in node.body:
                 self.visit(stmt)
         
+    def visit_WhileOp(self, node):
+        result = self.visit(node.expr)
+        
+        while result:
+            for stmt in node.body:
+                self.visit(stmt)
+            
+            result = self.visit(node.expr)
+            
+                    
     def interpret(self):
         for node in self.tree:
             self.visit(node)
