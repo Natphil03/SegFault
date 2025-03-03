@@ -34,6 +34,15 @@ class IfOp(AST):
         self.expr = expr
         self.body = body
 
+class ElseIfOp(AST):
+    def __init__(self, expr, body):
+        self.expr = expr
+        self.body = body
+
+class ElseOp(AST):
+    def __init__(self, body):
+        self.body = body
+
 class WhileOp(AST):
     def __init__(self, expr, body):
         self.expr = expr

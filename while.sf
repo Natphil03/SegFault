@@ -9,11 +9,18 @@ while (is_running) {
     print(i);
 
     if (i > 5){
+        if (check_true){
+            print("Check TRUE");
+        };
+        
         print("hello");
         is_running = False;
     } 
-    elseif (i < 5){
+    elseif (i > 3){
         print(i + " : below");
+    }
+    else {
+        print("test here");
     };
     
 };

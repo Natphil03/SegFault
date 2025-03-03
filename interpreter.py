@@ -133,6 +133,17 @@ class Interpreter:
             for stmt in node.body:
                 self.visit(stmt)
         
+    def visit_ElseIfOp(self, node):
+        result = self.visit(node.expr)
+        
+        if result:
+            for stmt in node.body:
+                self.visit(stmt)
+        
+    def visit_ElseOp(self, node):
+        for stmt in node.body:
+            self.visit(stmt)
+        
     def visit_WhileOp(self, node):
         result = self.visit(node.expr)
         

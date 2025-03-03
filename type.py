@@ -49,6 +49,7 @@ class types(Enum):
     WHILE = 41,
     FOR = 42,
     ELSEIF = 43,
+    ELSE = 45,
         
     LPAREN = 8,
     RPAREN = 9,

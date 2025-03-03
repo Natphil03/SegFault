@@ -101,6 +101,9 @@ class Parser:
         
         elif self.current_token.type == types.ELSEIF:
             return self.elseif_STMT()
+        
+        elif self.current_token.type == types.ELSE:
+            return self.else_STMT()
 
         elif self.current_token.type == types.WHILE:
             return self.while_STMT()
@@ -150,7 +153,19 @@ class Parser:
         else:
             body = [self.handle_token()]  # Handle single statement
 
-        return IfOp(expr=node_val, body=body)
+        return ElseIfOp(expr=node_val, body=body)
+
+                
+    def else_STMT(self):
+        print("else_STMT")
+        self.eat(types.ELSE)
+
+        if self.current_token.type == types.CB_OPEN:
+            body = self.block()  # Parse the block if { is found
+        else:
+            body = [self.handle_token()]  # Handle single statement
+
+        return ElseOp(body=body)
 
 
     def while_STMT(self):

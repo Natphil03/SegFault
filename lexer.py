@@ -81,35 +81,36 @@ class Lexer:
         return result
     
     def handle_word_tokens(self, identifier):
-        if identifier:
-            if identifier == 'True':
-                return Token(types.TRUE, 'True')
-            elif identifier == 'False':
-                return Token(types.FALSE, 'False')
-            elif identifier == 'and':
-                return Token(types.AND, 'and')
-            elif identifier == 'or':
-                return Token(types.OR, 'or')
-            elif identifier == 'int':
-                return Token(types.INTEGER_TYPE, 'int')
-            elif identifier == 'string':
-                return Token(types.STRING_TYPE, 'string')
-            elif identifier == 'bool':
-                return Token(types.BOOL_TYPE, 'bool')
-            elif identifier == 'float':
-                return Token(types.FLOAT_TYPE, 'float')
-            elif identifier == 'print':
-                return Token(types.PRINT_STMT, 'print')
-            elif identifier == 'del':
-                return Token(types.DELETE_VAR, 'del')
-            elif identifier == 'if':
-                return Token(types.IF, 'if')
-            elif identifier == 'elseif':
-                return Token(types.ELSEIF, 'elseif')
-            elif identifier == 'while':
-                return Token(types.WHILE, 'while')
-            else:
-                return Token(types.IDENTIFIER, identifier)  # Variable name or function name
+        if identifier == 'True':
+            return Token(types.TRUE, 'True')
+        elif identifier == 'False':
+            return Token(types.FALSE, 'False')
+        elif identifier == 'and':
+            return Token(types.AND, 'and')
+        elif identifier == 'or':
+            return Token(types.OR, 'or')
+        elif identifier == 'int':
+            return Token(types.INTEGER_TYPE, 'int')
+        elif identifier == 'string':
+            return Token(types.STRING_TYPE, 'string')
+        elif identifier == 'bool':
+            return Token(types.BOOL_TYPE, 'bool')
+        elif identifier == 'float':
+            return Token(types.FLOAT_TYPE, 'float')
+        elif identifier == 'print':
+            return Token(types.PRINT_STMT, 'print')
+        elif identifier == 'del':
+            return Token(types.DELETE_VAR, 'del')
+        elif identifier == 'if':
+            return Token(types.IF, 'if')
+        elif identifier == 'elseif':
+            return Token(types.ELSEIF, 'elseif')
+        elif identifier == 'else':
+            return Token(types.ELSE, 'else')
+        elif identifier == 'while':
+            return Token(types.WHILE, 'while')
+        else:
+            return Token(types.IDENTIFIER, identifier)  # Variable name or function name
     
     def get_next_token(self):
         while self.current_char is not None:

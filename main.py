@@ -10,7 +10,6 @@ def main():
     
     lexer = Lexer(content)
     tokens = lexer.lex()
-    # print(tokens)
     
     parser = Parser(tokens)
     AST = parser.parse()
