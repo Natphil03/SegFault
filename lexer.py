@@ -38,7 +38,7 @@ class Lexer:
             result += self.text[self.pos + i]                
         return result
     
-    def identifier(self):
+    def find_identifier(self):
         result = ''
 
         while self.current_char is not None and (self.current_char.isalnum() or self.current_char == '_'):
@@ -66,8 +66,52 @@ class Lexer:
             
         return float(result)
     
-    def get_next_token(self):
+    def find_string(self):
+        result = ''
         
+        while self.current_char is not None and self.current_char != '"':
+            result += self.current_char
+            self.advance()
+        
+        if self.current_char == '"':
+            self.advance()  # Skip the closing quote
+        else:
+            raise Exception('Unterminated string literal')
+
+        return result
+    
+    def handle_word_tokens(self, identifier):
+        if identifier:
+            if identifier == 'True':
+                return Token(types.TRUE, 'True')
+            elif identifier == 'False':
+                return Token(types.FALSE, 'False')
+            elif identifier == 'and':
+                return Token(types.AND, 'and')
+            elif identifier == 'or':
+                return Token(types.OR, 'or')
+            elif identifier == 'int':
+                return Token(types.INTEGER_TYPE, 'int')
+            elif identifier == 'string':
+                return Token(types.STRING_TYPE, 'string')
+            elif identifier == 'bool':
+                return Token(types.BOOL_TYPE, 'bool')
+            elif identifier == 'float':
+                return Token(types.FLOAT_TYPE, 'float')
+            elif identifier == 'print':
+                return Token(types.PRINT_STMT, 'print')
+            elif identifier == 'del':
+                return Token(types.DELETE_VAR, 'del')
+            elif identifier == 'if':
+                return Token(types.IF, 'if')
+            elif identifier == 'elseif':
+                return Token(types.ELSEIF, 'elseif')
+            elif identifier == 'while':
+                return Token(types.WHILE, 'while')
+            else:
+                return Token(types.IDENTIFIER, identifier)  # Variable name or function name
+    
+    def get_next_token(self):
         while self.current_char is not None:
             self.ignore_whitespace()
             
@@ -79,8 +123,6 @@ class Lexer:
                 self.advance()
                 return Token(types.SEMI_COLON, ';')
             
-
-
             if self.current_char.isdigit():
                 if self.is_float():
                     return Token(types.FLOAT, self.find_float())
@@ -89,48 +131,13 @@ class Lexer:
             
             if self.current_char == '"':
                 self.advance()  # Skip the opening quote
-                result = ''
-                
-                while self.current_char is not None and self.current_char != '"':
-                    result += self.current_char
-                    self.advance()
-                
-                if self.current_char == '"':
-                    self.advance()  # Skip the closing quote
-                else:
-                    raise Exception('Unterminated string literal')
-
+                result = self.find_string()
                 return Token(types.STRING, result)
 
-            identifier = self.identifier()
-
+            identifier = self.find_identifier()
+            
             if identifier:
-                if identifier == 'True':
-                    return Token(types.TRUE, 'True')
-                elif identifier == 'False':
-                    return Token(types.FALSE, 'False')
-                elif identifier == 'and':
-                    return Token(types.AND, 'and')
-                elif identifier == 'or':
-                    return Token(types.OR, 'or')
-                elif identifier == 'int':
-                    return Token(types.INTEGER_TYPE, 'int')
-                elif identifier == 'string':
-                    return Token(types.STRING_TYPE, 'string')
-                elif identifier == 'bool':
-                    return Token(types.BOOL_TYPE, 'bool')
-                elif identifier == 'float':
-                    return Token(types.FLOAT_TYPE, 'float')
-                elif identifier == 'print':
-                    return Token(types.PRINT_STMT, 'print')
-                elif identifier == 'del':
-                    return Token(types.DELETE_VAR, 'del')
-                elif identifier == 'if':
-                    return Token(types.IF, 'if')
-                elif identifier == 'while':
-                    return Token(types.WHILE, 'while')
-                else:
-                    return Token(types.IDENTIFIER, identifier)  # Variable name or function name
+                return self.handle_word_tokens(identifier)
             
             if self.check_x_chars(2) == '==':
                 self.advance(offset=2)
@@ -196,7 +203,6 @@ class Lexer:
                 self.advance()
                 return Token(types.CB_CLOSE, '}')
             
-            print(self.current_char)
             raise Exception('Invalid character')
         
         return Token(types.EOF, None)

@@ -83,7 +83,7 @@ class Parser:
         if self.current_token.type == types.SEMI_COLON:
             self.eat(types.SEMI_COLON)
             return None
-
+        
         elif self.current_token.type in (types.INTEGER_TYPE, types.BOOL_TYPE, types.FLOAT_TYPE, types.STRING_TYPE):
             return self.declaration()
 
@@ -99,6 +99,9 @@ class Parser:
         elif self.current_token.type == types.IF:
             return self.if_STMT()
         
+        elif self.current_token.type == types.ELSEIF:
+            return self.elseif_STMT()
+
         elif self.current_token.type == types.WHILE:
             return self.while_STMT()
         
@@ -132,6 +135,23 @@ class Parser:
             body = [self.handle_token()]  # Handle single statement
 
         return IfOp(expr=node_val, body=body)
+
+            
+    def elseif_STMT(self):
+        self.eat(types.ELSEIF)
+        self.eat(types.LPAREN)
+
+        node_val = self.logical_or_expr()
+        
+        self.eat(types.RPAREN)
+
+        if self.current_token.type == types.CB_OPEN:
+            body = self.block()  # Parse the block if { is found
+        else:
+            body = [self.handle_token()]  # Handle single statement
+
+        return IfOp(expr=node_val, body=body)
+
 
     def while_STMT(self):
         self.eat(types.WHILE)

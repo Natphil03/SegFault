@@ -11,6 +11,9 @@ while (is_running) {
     if (i > 5){
         print("hello");
         is_running = False;
+    } 
+    elseif (i < 5){
+        print(i + " : below");
     };
     
 };
