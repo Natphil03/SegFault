@@ -4,6 +4,7 @@ class Interpreter:
     def __init__(self, tree):
         self.tree = tree
         self.symbol_tree = {}
+        self.skip_else = False
 
     def visit(self, node):
         method_name = f'visit_{type(node).__name__}'
@@ -127,20 +128,32 @@ class Interpreter:
             raise Exception("Variable does not exist, cannot delete")
 
     def visit_IfOp(self, node):
-        result = self.visit(node.expr)
+        self.skip_else = False
         
+        result = self.visit(node.expr)
+
         if result:
             for stmt in node.body:
                 self.visit(stmt)
-        
+            
+            self.skip_else = True
+
     def visit_ElseIfOp(self, node):
+        if self.skip_else:
+            return
+        
         result = self.visit(node.expr)
         
         if result:
             for stmt in node.body:
                 self.visit(stmt)
+            
+            self.skip_else = True
         
     def visit_ElseOp(self, node):
+        if self.skip_else:
+            return
+        
         for stmt in node.body:
             self.visit(stmt)
         
@@ -152,8 +165,7 @@ class Interpreter:
                 self.visit(stmt)
             
             result = self.visit(node.expr)
-            
-                    
+
     def interpret(self):
         for node in self.tree:
             self.visit(node)

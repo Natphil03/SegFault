@@ -4,12 +4,13 @@ from parser import Parser
 
 def main():
     
-    src = open("while.sf", "r")
+    src = open("test.sf", "r")
     content = src.read()
     # print(content)
     
     lexer = Lexer(content)
     tokens = lexer.lex()
+    # print(tokens)
     
     parser = Parser(tokens)
     AST = parser.parse()

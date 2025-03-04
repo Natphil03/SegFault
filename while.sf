@@ -13,16 +13,17 @@ while (is_running) {
             print("Check TRUE");
         };
         
-        print("hello");
+        print("IF here");
+
         is_running = False;
     } 
     elseif (i > 3){
-        print(i + " : below");
+        print("ELSEIF here");
     }
     else {
-        print("test here");
+        print("ELSE here");
     };
     
 };
 
-print("HELLO END");
+print("END here");
