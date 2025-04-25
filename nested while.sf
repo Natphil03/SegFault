@@ -1,0 +1,46 @@
+bool is_running = True;
+bool check_true = True;
+bool nested_while = True;
+
+int i = 0;
+int x = 0;
+
+while (is_running) {
+
+    while (nested_while){ 
+
+        print("nested_while");
+        x = x + 1;
+        
+        if (x == 5){
+            nested_while = False;
+            int e = 555;
+            print(e);
+        };
+    };
+
+
+    i = i + 1;
+    
+    print(i);
+
+    if (i > 5){
+        
+        if (check_true){
+            print("Check TRUE");
+        };
+        
+        print("IF here");
+
+        is_running = False;
+    } 
+    elseif (i > 3){
+        print("ELSEIF here");
+    }
+    else {
+        print("ELSE here");
+    };
+    
+};
+
+print("END here");

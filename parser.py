@@ -157,7 +157,6 @@ class Parser:
 
                 
     def else_STMT(self):
-        print("else_STMT")
         self.eat(types.ELSE)
 
         if self.current_token.type == types.CB_OPEN:

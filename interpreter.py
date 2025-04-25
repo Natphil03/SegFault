@@ -3,7 +3,7 @@ from type import *
 class Interpreter:
     def __init__(self, tree):
         self.tree = tree
-        self.symbol_tree = {}
+        self.symbol_tree = [{}]
         self.skip_else = False
 
     def visit(self, node):
@@ -53,14 +53,9 @@ class Interpreter:
             return left or right
     
     def visit_Identifier(self, node):
-        if node.name in self.symbol_tree:
-            return self.symbol_tree[node.name]["value"]
-        else:
-            return Exception("Variable does not exist")
-
+        return self.get_variable(node.name)
 
     def visit_BinOp(self, node):
-
         left = self.visit(node.left)
         right = self.visit(node.right)
 
@@ -102,70 +97,100 @@ class Interpreter:
             return not self.visit(node.expr)
 
     def visit_DeclarationOp(self, node):
-        if node.left.value not in self.symbol_tree:
-            visited_node = self.visit(node.right)
-            self.symbol_tree[node.left.value] = {}
-            self.symbol_tree[node.left.value]["type"] = type(visited_node)
-            self.symbol_tree[node.left.value]["value"] = visited_node 
-        else:
-            raise Exception("A Variable is already declared with the same name")
+        value = self.visit(node.right)
+        self.declare_variable(node.left.value, value)
+
     
     def visit_AssignOp(self, node):
-        if node.left.value in self.symbol_tree:
-            visited_node = self.visit(node.right)
-            
-            if type(visited_node) != self.symbol_tree[node.left.value]["type"]:
-                raise Exception("Variable Types does not match, cannot assign new value")
+        value = self.visit(node.right)
+        self.set_variable(node.left.value, value)
 
-            self.symbol_tree[node.left.value]["value"] = visited_node
-        else:
-            raise Exception("Variable does not exist, cannot assign new value")
-           
     def visit_DeAssignOp(self, node):
-        if node.iden.value in self.symbol_tree:
-            self.symbol_tree.pop(node.iden.value)
-        else:
-            raise Exception("Variable does not exist, cannot delete")
+        self.delete_variable(node.iden.value)
 
     def visit_IfOp(self, node):
         self.skip_else = False
         
-        result = self.visit(node.expr)
-
-        if result:
+        if self.visit(node.expr):
+            self.symbol_tree.append({})  
+            
             for stmt in node.body:
                 self.visit(stmt)
-            
+                
+            self.symbol_tree.pop()      
             self.skip_else = True
+
 
     def visit_ElseIfOp(self, node):
         if self.skip_else:
             return
-        
-        result = self.visit(node.expr)
-        
-        if result:
+
+        if self.visit(node.expr):
+            self.symbol_tree.append({})  
+            
             for stmt in node.body:
                 self.visit(stmt)
-            
+            self.symbol_tree.pop()       
             self.skip_else = True
+
         
     def visit_ElseOp(self, node):
         if self.skip_else:
             return
-        
+
+        self.symbol_tree.append({})  
         for stmt in node.body:
             self.visit(stmt)
+            
+        self.symbol_tree.pop()       
+
         
     def visit_WhileOp(self, node):
-        result = self.visit(node.expr)
-        
-        while result:
+        while self.visit(node.expr):
+            self.symbol_tree.append({})  
+            
             for stmt in node.body:
                 self.visit(stmt)
+            self.symbol_tree.pop()       
+
+
+    def get_variable(self, name):
+        for scope in reversed(self.symbol_tree):
+            if name in scope:
+                return scope[name]["value"]
             
-            result = self.visit(node.expr)
+        raise Exception(f"Variable '{name}' not found")
+
+    def set_variable(self, name, value, expected_type=None):
+        for scope in reversed(self.symbol_tree):
+            if name in scope:
+                if expected_type and type(value) != expected_type:
+                    raise Exception(f"Type mismatch for variable '{name}'")
+                
+                scope[name]["value"] = value
+                return
+            
+        raise Exception(f"Variable '{name}' not found")
+
+    def declare_variable(self, name, value):
+        current_scope = self.symbol_tree[-1]
+        
+        if name in current_scope:
+            raise Exception(f"Variable '{name}' already declared in current scope")
+        
+        current_scope[name] = {"type": type(value), "value": value}
+
+    def delete_variable(self, name):
+        for scope in reversed(self.symbol_tree):
+            if name in scope:
+                del scope[name]
+                return
+            
+        raise Exception(f"Variable '{name}' not found to delete")
 
     def interpret(self):
         for node in self.tree:
             self.visit(node)
+            
+            
+            
