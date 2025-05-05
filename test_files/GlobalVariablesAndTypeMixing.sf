@@ -1,0 +1,15 @@
+int quickMaths = 9 + 10;
+quickMaths = quickMaths + 2;
+print(quickMaths);
+
+float floatTest = 1.0;
+floatTest = floatTest + 5;
+print(floatTest);
+
+string stringCatTest = "10 corgis";
+stringCatTest = stringCatTest + " and 5 more";
+print(stringCatTest);
+
+int errorTest = 5;
+errorTest = errorTest + "insert string here" + errorTest;
+print(errorTest);

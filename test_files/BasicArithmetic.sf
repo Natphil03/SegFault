@@ -1,0 +1,11 @@
+int result = (5 + 3) * (10 - 2) / 4;
+print(result);
+
+int negative = -(7 - 9);
+print(negative);
+
+int mixed = (3 * (2 + 4)) - (8 / 2);
+print(mixed);
+
+int division = (10 * 2) / (5 + 5);
+print(division);

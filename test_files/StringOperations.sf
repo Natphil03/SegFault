@@ -1,0 +1,11 @@
+string greeting = "Hello";
+string target = "World";
+
+string full_message = greeting + " " + target;
+print(full_message);
+
+bool equality_test = ("foo" + "bar") == "foobar";
+print(equality_test);
+
+bool inequality_test = ("10 corgis" != "10" + "corgis");
+print(inequality_test);

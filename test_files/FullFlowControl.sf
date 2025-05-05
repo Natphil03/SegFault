@@ -1,0 +1,32 @@
+bool is_running = True;
+string shopping_list = "";
+
+while (is_running) {
+    
+    string item = ""; 
+    
+    if (item == "") {
+        is_running = False;
+    }
+    else {
+        shopping_list = shopping_list + ", " + item;
+    };
+};
+
+print(shopping_list);
+
+int i = 0;
+while (i < 3) {
+    int j = 0;
+    while (j < 2) {
+        print("Nested Loop " + i + "," + j);
+        j = j + 1;
+    };
+    if (i == 1) {
+        print("i is one");
+    }
+    else {
+        print("i is not one");
+    };
+    i = i + 1;
+};

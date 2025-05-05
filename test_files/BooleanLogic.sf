@@ -1,0 +1,11 @@
+bool test1 = True == False;
+print(test1);
+
+bool test2 = True != False;
+print(test2);
+
+bool comparison = (5 < 10);
+print(comparison);
+
+bool complex = !(5 - 4 > 3 * 2 == !False);
+print(complex);
